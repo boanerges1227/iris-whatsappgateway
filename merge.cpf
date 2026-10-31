@@ -1,0 +1,7 @@
+[Actions]
+ModifyService:Name=%Service_CallIn,Enabled=1,AutheEnabled=48
+CreateResource:Name=%DB_WHATSAPP_DATA,Description="WHATSAPP_DATA database resource"
+CreateDatabase:Name=WHATSAPP_DATA,Directory=/usr/irissys/mgr/WHATSAPP_DATA,Resource=%DB_WHATSAPP_DATA
+CreateResource:Name=%DB_WHATSAPP_CODE,Description="WHATSAPP_CODE database resource"
+CreateDatabase:Name=WHATSAPP_CODE,Directory=/usr/irissys/mgr/WHATSAPP_CODE,Resource=%DB_WHATSAPP_CODE
+CreateNamespace:Name=WHATSAPP,Globals=WHATSAPP_DATA,Routines=WHATSAPP_CODE,Interop=1

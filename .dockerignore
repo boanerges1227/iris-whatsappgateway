@@ -1,0 +1,12 @@
+.git
+local-only
+.DS_Store
+*.log
+iris-main.log
+data
+mock/__pycache__
+__pycache__
+*.pyc
+.env
+.env.*
+node_modules

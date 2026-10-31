@@ -1,0 +1,28 @@
+zn "%SYS"
+
+    // Simple dev credentials. Do not do this in production.
+    do ##class(Security.Users).UnExpireUserPasswords("*")
+
+    // Enable callin for Embedded Python / external tooling
+    do ##class(Security.Services).Get("%Service_CallIn",.prop)
+    set prop("Enabled")=1
+    set prop("AutheEnabled")=48
+    do ##class(Security.Services).Modify("%Service_CallIn",.prop)
+
+    zn "WHATSAPP"
+
+    // Compile runtime sources only; separate test assets are excluded from the release image.
+
+    set sc=$system.OBJ.LoadDir("/home/irisowner/dev/src","ck",,1)
+    if $system.Status.IsError(sc) do $system.Status.DisplayError(sc) halt
+
+    // Register demo production, SSL config and auto-start
+    set sc=##class(WhatsApp.Util.Setup).Setup()
+    if $system.Status.IsError(sc) do $system.Status.DisplayError(sc) halt
+
+    // Validate the production definition (start + stop once)
+    set sc=##class(WhatsApp.Util.Setup).Smoke()
+    if $system.Status.IsError(sc) do $system.Status.DisplayError(sc) halt
+
+    write !,"WHATSAPP_BUILD_OK=1",!
+    halt

@@ -1,0 +1,42 @@
+services:
+  iris:
+    build:
+      context: .
+      args:
+        IMAGE: ${IRIS_IMAGE:-intersystems/irishealth-community:2026.2}
+    container_name: iris-whatsapp-gateway
+    restart: unless-stopped
+    environment:
+      - ISC_CPF_MERGE_FILE=/home/irisowner/dev/merge.cpf
+    ports:
+      - "1972:1972"
+      - "52773:52773"
+      - "8090:8090"
+      - "8091:8091"
+    volumes:
+      - ./:/home/irisowner/dev
+    healthcheck:
+      test: ["CMD", "bash", "/home/irisowner/dev/scripts/healthcheck.sh"]
+      interval: 30s
+      timeout: 20s
+      retries: 30
+      start_period: 40s
+
+  mock:
+    build:
+      context: ./mock
+    container_name: iris-whatsapp-mock
+    restart: unless-stopped
+    environment:
+      - META_WEBHOOK_URL=http://iris:8090/webhook
+      - TWILIO_WEBHOOK_URL=http://iris:8091/webhook
+      - META_APP_SECRET=${META_APP_SECRET:-demo-app-secret}
+      - VERIFY_TOKEN=${VERIFY_TOKEN:-demo-verify-token}
+      - TWILIO_AUTH_TOKEN=${TWILIO_AUTH_TOKEN:-demo-twilio-token}
+      - MOCK_PHONE_NUMBER_ID=${MOCK_PHONE_NUMBER_ID:-1234567890}
+      - MOCK_WA_SENDER=${MOCK_WA_SENDER:-whatsapp:+15550001111}
+    ports:
+      - "8099:8099"
+    depends_on:
+      iris:
+        condition: service_healthy
